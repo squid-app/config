@@ -17,12 +17,12 @@ Configuration files are basic javascript object stored in a commun folder. There
 
 ## usage
 
-Config required the Application's name (eg: `core`, `desktop`, etc.), the base path where files are stored. You can add a thrid argument to define the current environement
+Config required the Application's name (eg: `core`, `desktop`, etc.), the base path where files are stored. You can add a thrid argument to define the current environement. Finally you can define a last object that override the produced configuration, mostly for development need.
 
     var ConfigManager = require('squid-config')
-      , SquidConfig   = new config( 'squid', './config/', 'test' )
-      
-      
+      , SquidConfig   = new config( 'squid', './config/', 'test', { foo: 'local' } )
+
+
 
 ## Tests
 
@@ -35,4 +35,5 @@ Add unit tests for any new or changed functionality. Lint and test your code.
 
 ## Release History
 
+* 0.2.0 Add local override
 * 0.1.0 Initial release

@@ -17,9 +17,10 @@ var _ = require('lodash')
 //      @params  {string}  app name
 //      @params  {string}  base path to config files
 //      @params  {string}  target env
+//      @params  {object}  local config override
 //      @return  {object}  Config instance
 //
-var Config = function( app, path, env )
+var Config = function( app, path, env, override )
 {
   path = path || false
   env  = env || 'default'
@@ -52,6 +53,7 @@ var Config = function( app, path, env )
   this._CONFIG = _.merge(
         confDefault
       , confEnv
+      , override || {}
     )
 
   return this

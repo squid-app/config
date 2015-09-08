@@ -11,13 +11,13 @@ var chai            = require('chai')
   , assert          = chai.assert
   , appConfig       = require('../config/squid')  // App config file
   , testConfig      = require('../config/test')  // Test config file
-  , totalBaseConfig = Object.keys( appConfig ).length
+  , totalBaseConfig = ( Object.keys( appConfig ).length + 1 ) // override
   , _ENV            = 'test'
   , Config          = require( '../index' )
 
 // New Squid Config instance
 // Setup w/ `test` environnement
-var SquidConfig = new Config( 'squid', './config/', _ENV )
+var SquidConfig = new Config( 'squid', './config/', _ENV, {test: true} )
 
 // Test Core library
 describe( 'test config library', function()
@@ -32,7 +32,7 @@ describe( 'test config library', function()
 
   it('Get the whole object', function()
   {
-    var baseConfig =  Object.keys( SquidConfig.get() ).length
+    var baseConfig = Object.keys( SquidConfig.get() ).length
 
     baseConfig
       .should

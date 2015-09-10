@@ -16,14 +16,24 @@ var _ = require('lodash')
 //
 //      @params  {string}  app name
 //      @params  {string}  base path to config files
-//      @params  {string}  target env
-//      @params  {object}  local config override
+//      @params  {mixed}   target env name or local object override
 //      @return  {object}  Config instance
 //
-var Config = function( app, path, env, override )
+function Config( app, path, env )
 {
+  // Constants
+  // -------------
+
+  this._CUSTOMENVNAME = 'Custom environment override'
+
+  // test instance uniqueness
+  this._UID         = _.uniqueId('config_')
+
+  // Variables
+  // -------------
+
   path = path || false
-  env  = env || 'default'
+  env  = env || {}
 
   if( _.isUndefined( app ) )
     throw new Error( '[Config] need app name' )
@@ -37,23 +47,49 @@ var Config = function( app, path, env, override )
   // CORE's settings
   // ------------------------
 
-  try // default app config
+  // default app configuration
+  try
   {
     var confDefault = require( path + app )
   }
   catch( e ) { throw new Error( '[Config::' + app + '] can not find default config' ) }
 
-  try // env based config
+  // environnement based configuration
+  var confEnv
+
+    // if we provide an object
+  if( _.isObject( env ) )
   {
-    var confEnv = require( path + env )
+    confEnv = env
+
+    // define environnement name
+      // no custom name provided
+      // if object is empty we call end "default"
+    if( _.isUndefined( env.customEnvName ) )
+      env = ( !Object.keys( env ).length ) ? 'default' : this._CUSTOMENVNAME
+      // else we use provided name
+    else
+      env = env.customEnvName
+
+    // delete provided name from final object
+    if( confEnv.customEnvName )
+      delete confEnv.customEnvName
   }
-  catch( e ) { throw new Error( '[Config::' + app + '] can not find env config' ) }
+  // we refer to a local file
+  else if( _.isString( env )  )
+  {
+    try
+    {
+      confEnv = require( path + env )
+    }
+    catch( e ) { throw new Error( '[Config::' + app + '] can not find config file ' + env + ' in ' + path ) }
+  }
 
   this._ENV    = env
   this._CONFIG = _.merge(
-        confDefault
+        {}
+      , confDefault
       , confEnv
-      , override || {}
     )
 
   return this

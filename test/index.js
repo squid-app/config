@@ -11,28 +11,49 @@ var chai            = require('chai')
   , assert          = chai.assert
   , appConfig       = require('../config/squid')  // App config file
   , testConfig      = require('../config/test')  // Test config file
-  , totalBaseConfig = ( Object.keys( appConfig ).length + 1 ) // override
+  , totalBaseConfig = Object.keys( appConfig ).length
   , _ENV            = 'test'
+  , _CUSTOMNAME     = 'My config object'
   , Config          = require( '../index' )
+  , overrideConfig  = { localSettings: true }
+  , namedConfig     = { someSettings: false, customEnvName: _CUSTOMNAME }
 
 // New Squid Config instance
 // Setup w/ `test` environnement
-var SquidConfig = new Config( 'squid', './config/', _ENV, {test: true} )
+var ConfigFile       = new Config( 'squid', './config/', _ENV )
+  , ConfigOverride   = new Config( 'squid', './config/', overrideConfig )
+  , OverrideWithName = new Config( 'squid', './config/', namedConfig )
 
 // Test Core library
 describe( 'test config library', function()
 {
-  it('Get environment', function()
+  it('Get config environment from files', function()
   {
-    SquidConfig
+    ConfigFile
       .getEnv()
       .should
       .equal( _ENV )
   })
 
+  it('Get override config without name ', function()
+  {
+    ConfigOverride
+      .getEnv()
+      .should
+      .equal( ConfigOverride._CUSTOMENVNAME )
+  })
+
+  it('Get override config with name ', function()
+  {
+    OverrideWithName
+      .getEnv()
+      .should
+      .equal( _CUSTOMNAME )
+  })
+
   it('Get the whole object', function()
   {
-    var baseConfig = Object.keys( SquidConfig.get() ).length
+    var baseConfig = Object.keys( ConfigFile.get() ).length
 
     baseConfig
       .should
@@ -41,15 +62,23 @@ describe( 'test config library', function()
 
   it('Get individual key', function()
   {
-    SquidConfig
+    ConfigFile
       .get('foo')
       .should
       .equal( testConfig.foo )
   })
 
+  it('Get individual key from custom', function()
+  {
+    ConfigOverride
+      .get('localSettings')
+      .should
+      .equal( overrideConfig.localSettings )
+  })
+
   it('Get deep nested key', function()
   {
-    SquidConfig
+    ConfigFile
       .get('nested.key')
       .should
       .equal( appConfig.nested.key )
@@ -57,7 +86,7 @@ describe( 'test config library', function()
 
   it('Get default value', function()
   {
-    SquidConfig
+    ConfigFile
       .get('fakekey', 'defaultValue')
       .should
       .equal( 'defaultValue' )
@@ -65,9 +94,9 @@ describe( 'test config library', function()
 
   it('Set key', function()
   {
-    SquidConfig.set( 'key', 'value' )
+    ConfigFile.set( 'key', 'value' )
 
-    SquidConfig
+    ConfigFile
       .get( 'key' )
       .should
       .equal( 'value' )
@@ -75,9 +104,9 @@ describe( 'test config library', function()
 
   it('Set object key', function()
   {
-    SquidConfig.set('test', { key: 'code', foo: 'bar', nested: 'value'} )
+    ConfigFile.set('test', { key: 'code', foo: 'bar', nested: 'value'} )
 
-    SquidConfig
+    ConfigFile
       .get( 'test.key' )
       .should
       .equal( 'code' )
@@ -85,8 +114,8 @@ describe( 'test config library', function()
 
   it('Unset key', function()
   {
-    SquidConfig.set('test.key', false, {unset: true})
+    ConfigFile.set('test.key', false, {unset: true})
 
-    assert.typeOf( SquidConfig.get('test.key'), 'undefined')
+    assert.typeOf( ConfigFile.get('test.key'), 'undefined')
   })
 })

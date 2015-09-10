@@ -35,5 +35,6 @@ Add unit tests for any new or changed functionality. Lint and test your code.
 
 ## Release History
 
+* 0.2.1 remove local override, fix default config reference
 * 0.2.0 Add local override
 * 0.1.0 Initial release

@@ -16,13 +16,13 @@ var chai            = require('chai')
   , _CUSTOMNAME     = 'My config object'
   , Config          = require( '../index' )
   , overrideConfig  = { localSettings: true }
-  , namedConfig     = { someSettings: false, customEnvName: _CUSTOMNAME }
+  , namedConfig     = { someSettings: false }
 
 // New Squid Config instance
 // Setup w/ `test` environnement
 var ConfigFile       = new Config( 'squid', './config/', _ENV )
   , ConfigOverride   = new Config( 'squid', './config/', overrideConfig )
-  , OverrideWithName = new Config( 'squid', './config/', namedConfig )
+  , OverrideWithName = new Config( 'squid', './config/', namedConfig, _CUSTOMNAME )
 
 // Test Core library
 describe( 'test config library', function()

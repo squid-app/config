@@ -17,9 +17,10 @@ var _ = require('lodash')
 //      @params  {string}  app name
 //      @params  {string}  base path to config files
 //      @params  {mixed}   target env name or local object override
+//      @params  {string}  custom env name
 //      @return  {object}  Config instance
 //
-function Config( app, path, env )
+function Config( app, path, env, envName )
 {
   // Constants
   // -------------
@@ -65,15 +66,11 @@ function Config( app, path, env )
     // define environnement name
       // no custom name provided
       // if object is empty we call end "default"
-    if( _.isUndefined( env.customEnvName ) )
+    if( _.isUndefined( envName ) )
       env = ( !Object.keys( env ).length ) ? 'default' : this._CUSTOMENVNAME
       // else we use provided name
     else
-      env = env.customEnvName
-
-    // delete provided name from final object
-    if( confEnv.customEnvName )
-      delete confEnv.customEnvName
+      env = envName
   }
   // we refer to a local file
   else if( _.isString( env )  )

@@ -1,6 +1,6 @@
 {
   "name": "squid-config",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A lightweight configuration class for Squid applications",
   "author": "Michael Lefebvre <michael@scenedata.com> (http://michael-lefebvre.com/)",
   "license": "MIT",

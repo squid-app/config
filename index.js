@@ -12,86 +12,62 @@
 
 var _ = require('lodash')
 
+
+var _LOGNAME = '[Config] '
+
 // Initialize Config Class
 //
-//      @params  {string}  app name
-//      @params  {string}  base path to config files
-//      @params  {mixed}   target env name or local object override
-//      @params  {string}  custom env name
+//      @params  {mixed}   object or file path
+//      @params  {mixed}   object or file path
 //      @return  {object}  Config instance
 //
-function Config( app, path, env, envName )
+function Config( defaults, extend, envName )
 {
   // Constants
   // -------------
 
-  this._CUSTOMENVNAME = 'Custom environment override'
-
   // test instance uniqueness
   this._UID         = _.uniqueId('config_')
 
-  // Variables
-  // -------------
+  this._DEFAULTENV  = 'default'
 
-  path = path || false
-  env  = env || {}
-
-  if( _.isUndefined( app ) )
-    throw new Error( '[Config] need app name' )
-
-  if( !path )
-    throw new Error( '[Config::' + app + '] need a base path to load config files' )
-
-  if( path.substr(-1) !== '/' )
-    path = path + '/'
 
   // CORE's settings
   // ------------------------
 
   // default app configuration
-  try
-  {
-    var confDefault = require( path + app )
-  }
-  catch( e ) { throw new Error( '[Config::' + app + '] can not find default config' ) }
+  var confDefault = this.getConfigParam( defaults )
+    , confExtend  = ( !_.isUndefined( extend ) )
+                    ? this.getConfigParam( extend )
+                    : {}
 
-  // environnement based configuration
-  var confEnv
-
-    // if we provide an object
-  if( _.isObject( env ) )
-  {
-    confEnv = env
-
-    // define environnement name
-      // no custom name provided
-      // if object is empty we call end "default"
-    if( _.isUndefined( envName ) )
-      env = ( !Object.keys( env ).length ) ? 'default' : this._CUSTOMENVNAME
-      // else we use provided name
-    else
-      env = envName
-  }
-  // we refer to a local file
-  else if( _.isString( env )  )
-  {
-    try
-    {
-      confEnv = require( path + env )
-    }
-    catch( e ) { throw new Error( '[Config::' + app + '] can not find config file ' + env + ' in ' + path ) }
-  }
-
-  this._ENV    = env
+  this._ENV    = envName || this._DEFAULTENV
   this._CONFIG = _.merge(
         {}
       , confDefault
-      , confEnv
+      , confExtend
     )
 
   return this
 }
 
+
+Config.prototype.getConfigParam = function( arg )
+{
+  if( _.isString( arg ) )
+  {
+    try
+    {
+      return require( arg )
+    }
+    catch( e ) { throw new Error( _LOGNAME + 'can not find config file ' + arg ) }
+  }
+
+  if( _.isObject( arg ) )
+    return arg
+
+  throw new Error( _LOGNAME + 'argument must be a valid file path or an object')
+}
 
 // Get Config environment
 //

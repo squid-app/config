@@ -13,16 +13,14 @@ var chai            = require('chai')
   , testConfig      = require('../config/test')  // Test config file
   , totalBaseConfig = Object.keys( appConfig ).length
   , _ENV            = 'test'
-  , _CUSTOMNAME     = 'My config object'
   , Config          = require( '../index' )
-  , overrideConfig  = { localSettings: true }
   , namedConfig     = { someSettings: false }
 
 // New Squid Config instance
 // Setup w/ `test` environnement
-var ConfigFile       = new Config( 'squid', './config/', _ENV )
-  , ConfigOverride   = new Config( 'squid', './config/', overrideConfig )
-  , OverrideWithName = new Config( 'squid', './config/', namedConfig, _CUSTOMNAME )
+var ConfigFile       = new Config( __dirname + '/../config/squid' )
+  , ConfigOverride   = new Config( __dirname + '/../config/squid', testConfig )
+  , OverrideWithName = new Config( namedConfig, __dirname + '/../config/squid', _ENV )
 
 // Test Core library
 describe( 'test config library', function()
@@ -32,15 +30,7 @@ describe( 'test config library', function()
     ConfigFile
       .getEnv()
       .should
-      .equal( _ENV )
-  })
-
-  it('Get override config without name ', function()
-  {
-    ConfigOverride
-      .getEnv()
-      .should
-      .equal( ConfigOverride._CUSTOMENVNAME )
+      .equal( ConfigFile._DEFAULTENV )
   })
 
   it('Get override config with name ', function()
@@ -48,7 +38,7 @@ describe( 'test config library', function()
     OverrideWithName
       .getEnv()
       .should
-      .equal( _CUSTOMNAME )
+      .equal( _ENV )
   })
 
   it('Get the whole object', function()
@@ -62,18 +52,10 @@ describe( 'test config library', function()
 
   it('Get individual key', function()
   {
-    ConfigFile
+    ConfigOverride
       .get('foo')
       .should
       .equal( testConfig.foo )
-  })
-
-  it('Get individual key from custom', function()
-  {
-    ConfigOverride
-      .get('localSettings')
-      .should
-      .equal( overrideConfig.localSettings )
   })
 
   it('Get deep nested key', function()
